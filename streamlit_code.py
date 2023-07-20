@@ -15,15 +15,13 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import matplotlib.ticker as ticker
 
-""" For using YouTube Data API we need a personal API key and then a list of channels id that we want to analyze.
 
-"""
+
 
 api_key = 'AIzaSyDTVR2RoWa9PB3uSVkaptspu4XpdxVM25k'
 channel_ids = ['UCzQUP1qoWDoEbmsQxvdjxgQ','UCPxMZIFE856tbTfdkdjzTSQ','UCpeRzRS1b1NvY4og1huE7jw','UC2bBsPXFWZWiBmkRiNlz8vg','UCUOjpYruRCB61RnB846trCQ','UCGX7nGXpz-CmO_Arg-cgJ7A','UCSHZKyawb77ixDdsGog4iWA','UCGq-a57w-aPwyi3pW7XLiHw','UCZjxPbi3AeB6YGKCfQ2TroQ','UCKPxuul6zSLAfKSsm123Vww','UCZxgZTreiWF-12p-GS5R7nQ','UC2D2CMWXMOVWx7giW1n3LIg','UCFo9mvW4ythx_tgT3NHaw-Q','UChMV78lIxhu3eqNtPMJGBtA']
 youtube = build('youtube','v3',developerKey = api_key)
 
-""" function to get general statistics about the channels."""
 
 def get_channel_stats(youtube,channel_id):
 
@@ -37,7 +35,7 @@ def get_channel_stats(youtube,channel_id):
                     playlist_id = response['items'][0]['contentDetails']['relatedPlaylists']['uploads'])
     return data
 
-""" Let's put all general statistics in one data frame."""
+
 
 general_stats = pd.DataFrame()
 
@@ -47,7 +45,6 @@ for i in range(len(channel_ids)):
 
 general_stats = general_stats.reset_index(drop=True)
 
-"""function to get all video ids of a channel."""
 
 def get_video_ids(youtube, playlist_id):
     request = youtube.playlistItems().list(part = 'contentDetails',playlistId = playlist_id, maxResults=100)
@@ -73,14 +70,12 @@ def get_video_ids(youtube, playlist_id):
 
     return videos_id
 
-"""Let's store all video ids, it will be a list of lists that contain video ids for each channel separately."""
 
 video_ids = []
 
 for i in range(len(channel_ids)):
     video_ids.append(get_video_ids(youtube, general_stats.playlist_id.iloc[i]))
 
-"""Function to get video details"""
 
 def get_video_details(youtube, video_ids):
     all_video_stats = []
@@ -95,7 +90,7 @@ def get_video_details(youtube, video_ids):
             all_video_stats.append(video_stats)
     return all_video_stats
 
-"""Storing all video information data frames in a list."""
+
 
 video_dfs = []
 
@@ -104,7 +99,7 @@ for i in range(len(channel_ids)):
     df['Identity'] = general_stats.Channel_name.iloc[i]  # to know to which channel the video belongs.
     video_dfs.append(df)
 
-"""Concating all video_dfs into one big data frame."""
+
 
 video_df = pd.DataFrame()
 for df in video_dfs:
@@ -112,21 +107,20 @@ for df in video_dfs:
 
 video_df = video_df.reset_index(drop= True)
 
-"""Let's change the type of the numeric columns to int, and the date column to date, instead of object."""
 
 general_stats['Subscribers_count'] = pd.to_numeric(general_stats['Subscribers_count'])
 general_stats['Total_Views_Count'] = pd.to_numeric(general_stats['Total_Views_Count'])
 general_stats['Total_Videos'] = pd.to_numeric(general_stats['Total_Videos'])
 general_stats['DateStarted'] = pd.to_datetime(general_stats['DateStarted'], errors ='coerce').dt.floor('d')
 
-"""Let's change the numeric columns to int, and the date column to date, instead of object in the video_df data frame."""
+
 
 video_df['Publish_Date'] = pd.to_datetime(video_df['Publish_Date']).dt.date.astype('datetime64')
 video_df['Views'] = pd.to_numeric(video_df['Views'])
 video_df['Likes'] = pd.to_numeric(video_df['Likes'])
 video_df['Comments'] = pd.to_numeric(video_df['Comments'])
 
-"""Function to return top 10 viewed videos ever."""
+
 
 def top_ten_viewed(df):
     fig, ax = plt.subplots()
@@ -144,7 +138,7 @@ def top_ten_viewed(df):
         height = bar.get_height()
         ax.text(x+width/2., height + 0.2, label, ha="center")
 
-# Function to return top 10 viewed videos for a specific channel.
+
 
 def top_ten_viewed_by_name(df, name):
     fig, ax = plt.subplots()
@@ -157,7 +151,7 @@ def top_ten_viewed_by_name(df, name):
     plt.xticks(rotation=90)
     sns.barplot(y=top_ten['Views'] , x=top_ten['Title'], palette ='Blues_r').set_xticklabels(labels = top_ten['Title']);
 
-# TOP 10 Liked videos ever.
+
 
 def top_ten_Liked(df):
     fig, ax = plt.subplots()
@@ -174,7 +168,7 @@ def top_ten_Liked(df):
         height = bar.get_height()
         ax.text(x+width/2., height + 0.2, label, ha="center")
 
-# Top 10 Liked Videos by Channel.
+
 
 def top_ten_Liked_by_name(df, name):
     fig, ax = plt.subplots()
@@ -186,7 +180,7 @@ def top_ten_Liked_by_name(df, name):
     plt.xticks(rotation=90)
     sns.barplot(y=top_ten['Likes'] , x=top_ten['Title'], palette ='Blues_r').set_xticklabels(labels = top_ten['Title']);
 
-# Count of subscribers for each channel.
+
 
 def sub_count(df):
     fig, ax = plt.subplots()
@@ -201,9 +195,7 @@ def sub_count(df):
     sns.barplot(x=subs, y=names, palette='Blues_r', order=names_ordered).set_yticklabels(labels=names_ordered);
     ax.bar_label(ax.containers[0], fmt = '%d');
 
-"""# Line plot of dates the channels got started.
 
-"""
 
 def timeline(df):
     fig, ax = plt.subplots();
