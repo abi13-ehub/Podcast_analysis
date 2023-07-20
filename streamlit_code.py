@@ -7,9 +7,9 @@ Original file is located at
     https://colab.research.google.com/github/abi13-ehub/Podcast_analysis/blob/main/Streamlit%20code.ipynb
 """
 
-!pip3 install google-api-python-client
+pip3 install google-api-python-client
 
-!pip install streamlit
+pip install streamlit
 
 from googleapiclient.discovery import build
 import pandas as pd
